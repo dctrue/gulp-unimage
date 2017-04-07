@@ -1,0 +1,28 @@
+{
+  "name": "gulp-unimage",
+  "version": "1.0.0",
+  "description": "Remove unused image file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gulp",
+    "image",
+    "gulpplugin"
+  ],
+  "author": "jlw <dctrue.jiang@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "css": "^2.2.1",
+    "gulp-util": "^3.0.8",
+    "htmlparser2": "^3.9.2",
+    "through2": "^2.0.3",
+    "vinyl-fs": "^2.4.4"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "mocha": "^3.2.0",
+    "should": "^11.2.1"
+  }
+}
