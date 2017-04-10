@@ -21,7 +21,11 @@ function getUsedImages(filesGlob, callBack){
 
 	let usedImages = []
 
-	// 列表更新图片url列表
+	/**
+	 * 已使用图片列表添加
+	 * @param url
+	 * @returns {Array}
+	 */
 	const usedImagesAdd = function(url){
 		// base64、非本地地址排除
 		if(url.match(/(data|http|https):/)) return
@@ -34,9 +38,14 @@ function getUsedImages(filesGlob, callBack){
 			}
 		}
 		if(!flag) usedImages.push(url)
+		return usedImages
 	}
 
-	// 样式处理
+	/**
+	 * 样式类型处理
+	 * @param content
+	 * @param basePath
+	 */
 	const parseCss = function(content, basePath){
 		const CSS_REGEXP = new RegExp(/url\(("|'|)(.+?)\1\)/)
 		const ast = css.parse(content)
@@ -53,7 +62,11 @@ function getUsedImages(filesGlob, callBack){
 		})
 	}
 
-	// html处理
+	/**
+	 * html类型处理
+	 * @param content
+	 * @param basePath
+	 */
 	const parseHtml = function(content, basePath){
 
 		const parser = new htmlParser.Parser({
@@ -92,10 +105,11 @@ function getUsedImages(filesGlob, callBack){
 
 		// 样式文件处理
 		const fileType = utils.typeByUrl(file.path)
+		const fileContents = String(file.contents)
 		if(fileType == 'css'){
-			parseCss(String(file.contents), file.base)
+			parseCss(fileContents, file.base)
 		}else if(fileType == 'html'){
-			parseHtml(String(file.contents), file.base)
+			parseHtml(fileContents, file.base)
 		}
 
 		cb()

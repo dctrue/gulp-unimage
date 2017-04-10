@@ -5,21 +5,13 @@
 const path = require('path')
 
 /**
- * 判断是否是图片类型
+ * 根据URL返回资源类型
  * @param url
- * @returns {boolean}
+ * @returns {*}
  */
-exports.isImage = function(url){
-	const IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif']
-	// 获取扩展名
-	const extension = path.extname(url).toLowerCase()
-	// 过滤非图片
-	return IMG_EXTENSIONS.indexOf(extension) !== -1
-}
-
 exports.typeByUrl = function(url){
 	let type = null
-	const IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif']
+	const IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', 'svg', '.ico']
 	const HTML_EXTENSIONS = ['.html']
 	const CSS_EXTENSIONS = ['.css']
 	// 获取扩展名
@@ -37,7 +29,7 @@ exports.typeByUrl = function(url){
 /**
  * 判断是否是使用的图片
  * @param url
- * @param useds
+ * @param used
  * @returns {boolean}
  */
 exports.isUsedImage = function(url, used){
