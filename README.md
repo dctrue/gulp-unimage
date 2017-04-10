@@ -1,5 +1,7 @@
 # gulp-unimage
 
+[![Build Status](https://travis-ci.org/dctrue/gulp-unimage.svg?branch=master)](https://travis-ci.org/dctrue/gulp-unimage)
+
 gulp-unimage is a gulp plugin to remove unused image when package images.
 
 ## Install
