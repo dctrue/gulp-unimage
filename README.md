@@ -14,8 +14,8 @@ npm install gulp-unimage --save-dev
 You can use sigle files, globbing patterns or URLS to run gulp-unimage:
 
 ```js
-const gulp = require('gulp')
-const gulpUnimage = require('../index')
+var gulp = require('gulp')
+var gulpUnimage = require('../index')
 
 gulp.task('default', function(){
 	gulp.src('../test/fixture/images/**/*')

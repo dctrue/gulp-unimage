@@ -2,8 +2,8 @@
  * Created by jlw on 2017/4/6.
  */
 
-const gulp = require('gulp')
-const gulpUnimage = require('../index')
+var gulp = require('gulp')
+var gulpUnimage = require('../index')
 
 gulp.task('default', function(){
 	gulp.src('../test/fixture/images/**/*')

@@ -2,7 +2,7 @@
  * Created by jlw on 2017/4/6.
  */
 
-const path = require('path')
+var path = require('path')
 
 /**
  * 根据URL返回资源类型
@@ -10,12 +10,12 @@ const path = require('path')
  * @returns {*}
  */
 exports.typeByUrl = function(url){
-	let type = null
-	const IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', 'svg', '.ico']
-	const HTML_EXTENSIONS = ['.html']
-	const CSS_EXTENSIONS = ['.css']
+	var type = null
+	var IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', 'svg', '.ico']
+	var HTML_EXTENSIONS = ['.html']
+	var CSS_EXTENSIONS = ['.css']
 	// 获取扩展名
-	const extension = path.extname(url).toLowerCase()
+	var extension = path.extname(url).toLowerCase()
 	if(IMG_EXTENSIONS.indexOf(extension) !== -1){
 		type = 'image'
 	}else if(HTML_EXTENSIONS.indexOf(extension) !== -1){
@@ -33,8 +33,8 @@ exports.typeByUrl = function(url){
  * @returns {boolean}
  */
 exports.isUsedImage = function(url, used){
-	let flag = false
-	for(let i = 0, len = used.length; i < len; i++){
+	var flag = false
+	for(var i = 0, len = used.length; i < len; i++){
 		if(used[i] === url){
 			flag = true
 			break

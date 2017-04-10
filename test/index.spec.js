@@ -2,29 +2,29 @@
  * Created by jlw on 2017/4/6.
  */
 
-const fs = require('fs')
-const path = require('path')
-const gutil = require('gulp-util')
-const gulpUnimage = require('../index')
+var fs = require('fs')
+var path = require('path')
+var gutil = require('gulp-util')
+var gulpUnimage = require('../index')
 
 require('should')
 
 describe('gulp unused image filter', () => {
 
-	const gulpUnimageOptions = {
+	var gulpUnimageOptions = {
 		files: 'fixture/*.{html,css}'
 	}
 
 	it('images should be passed when be used', done => {
 		var fileData = []
-		let useImages = ['test.jpg', 'test.png', 'test.gif', 'test.ico']
+		var useImages = ['test.jpg', 'test.png', 'test.gif', 'test.ico']
 
-		const stream = gulpUnimage(gulpUnimageOptions)
+		var stream = gulpUnimage(gulpUnimageOptions)
 
 		stream.on('end', () => {
 			// TODO: 在终端下直接mocha测试有问题，待解决
 			// (fileData.length).should.eql(useImages.length)
-			// for(let i = 0, len = fileData.length; i < len; i++){
+			// for(var i = 0, len = fileData.length; i < len; i++){
 			// 	fileData[i].basename.should.eql(useImages[i])
 			// }
 			done()
@@ -35,8 +35,8 @@ describe('gulp unused image filter', () => {
 			}
 		})
 
-		for(let i = 0, len = useImages.length; i < len; i++){
-			const fakeFile = new gutil.File({
+		for(var i = 0, len = useImages.length; i < len; i++){
+			var fakeFile = new gutil.File({
 				path: path.normalize(`${__dirname}/fixture/images/${useImages[i]}`),
 				contents: fs.readFileSync(`${__dirname}/fixture/images/${useImages[i]}`)
 			})
@@ -48,11 +48,11 @@ describe('gulp unused image filter', () => {
 
 	it('image should be filter when be not used', done => {
 
-		let fileData = null
+		var fileData = null
 
-		const stream = gulpUnimage(gulpUnimageOptions)
+		var stream = gulpUnimage(gulpUnimageOptions)
 
-		const fakeFile = new gutil.File({
+		var fakeFile = new gutil.File({
 			path: path.normalize(`${__dirname}/fixture/images/other.jpg`),
 			contents: fs.readFileSync(`${__dirname}/fixture/images/other.jpg`)
 		})
@@ -71,11 +71,11 @@ describe('gulp unused image filter', () => {
 	})
 
 	it('other type should be filter', done => {
-		let fileData = null
+		var fileData = null
 
-		const stream = gulpUnimage(gulpUnimageOptions)
+		var stream = gulpUnimage(gulpUnimageOptions)
 
-		const fakeFile = new gutil.File({
+		var fakeFile = new gutil.File({
 			path: path.normalize(`${__dirname}/fixture/images/test.txt`),
 			contents: fs.readFileSync(`${__dirname}/fixture/images/test.txt`)
 		})
