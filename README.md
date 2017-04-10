@@ -38,4 +38,5 @@ The base files(html|css), we find in this base files, and make sure the image is
 
 ## Release History
 
+* 0.0.2 Readme detail
 * 0.0.1 Initial release
