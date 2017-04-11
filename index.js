@@ -3,15 +3,16 @@
  */
 
 'use strict'
-var through = require('through2')
-var gutil = require('gulp-util')
-var path = require('path')
 
-var utils = require('./libs/utils')
-var getUsedImages = require('./libs/getUsedImages')
+const through = require('through2')
+const gutil = require('gulp-util')
+const path = require('path')
+
+const utils = require('./libs/utils')
+const getUsedImages = require('./libs/getUsedImages')
 
 // 插件名称
-var PLUGIN_NAME = 'gulp-unimage'
+const PLUGIN_NAME = 'gulp-unimage'
 
 /**
  * 过滤没有使用过的图片 主函数
@@ -21,12 +22,14 @@ var PLUGIN_NAME = 'gulp-unimage'
  */
 function unUsedImage(options){
 
+	// TODO: 加特殊图片不过滤处理
+
 	options = options || {}
 
 	// 已使用图片的列表
-	var usedImages = null
+	let usedImages = null
 	// 过滤的文件列表
-	var unUsed = {
+	let unUsed = {
 		image: [],
 		other: []
 	}
@@ -37,7 +40,7 @@ function unUsedImage(options){
 	 * @param type
 	 */
 	function unUsedAdd(filePath, type){
-		var nomalPath = path.normalize(filePath)
+		const nomalPath = path.normalize(filePath)
 		type && !!unUsed[type] ? unUsed[type].push(nomalPath) : unUsed['other'].push(nomalPath)
 	}
 
@@ -69,7 +72,7 @@ function unUsedImage(options){
 		 * 过滤没有使用的图片
 		 * @returns {*}
 		 */
-		var filterImages = function(){
+		const filterImages = function(){
 			if(!utils.isUsedImage(file.path, usedImages)){
 				unUsedAdd(file.path, 'image')
 				return callBack()
@@ -102,8 +105,8 @@ function unUsedImage(options){
 		gutil.log('And others: ' + unUsed.other.length)
 		gutil.log('--------------------------------------')
 		// 控制台输出被过滤列表
-		for(var key in unUsed){
-			for(var i = 0, len = unUsed[key].length; i < len; i++){
+		for(let key in unUsed){
+			for(let i = 0, len = unUsed[key].length; i < len; i++){
 				gutil.log(gutil.colors.blue(unUsed[key][i]))
 			}
 		}
@@ -112,7 +115,7 @@ function unUsedImage(options){
 
 	}
 
-	var stream = through.obj(bufferContents, endStream)
+	const stream = through.obj(bufferContents, endStream)
 
 	// 返回流
 	return stream

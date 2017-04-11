@@ -2,13 +2,15 @@
  * Created by jlw on 2017/4/7.
  */
 
-var vfs = require('vinyl-fs')
-var through = require('through2')
-var path = require('path')
-var css = require('css')
-var htmlParser = require('htmlparser2')
+'use strict'
 
-var utils = require('./utils')
+const vfs = require('vinyl-fs')
+const through = require('through2')
+const path = require('path')
+const css = require('css')
+const htmlParser = require('htmlparser2')
+
+const utils = require('./utils')
 
 /**
  * 读取源过滤文件，获取过滤列表
@@ -19,20 +21,20 @@ function getUsedImages(filesGlob, callBack){
 
 	callBack = callBack || function(){}
 
-	var usedImages = []
+	let usedImages = []
 
 	/**
 	 * 已使用图片列表添加
 	 * @param url
 	 * @returns {Array}
 	 */
-	var usedImagesAdd = function(url){
+	const usedImagesAdd = function(url){
 		// base64、非本地地址排除
 		if(url.match(/(data|http|https):/)) return
 
 		// 去掉重复的url
-		var flag = false
-		for(var i = 0, len = usedImages.length; i < len; i++){
+		let flag = false
+		for(let i = 0, len = usedImages.length; i < len; i++){
 			if(usedImages[i] === url){
 				flag = true
 			}
@@ -46,15 +48,17 @@ function getUsedImages(filesGlob, callBack){
 	 * @param content
 	 * @param basePath
 	 */
-	var parseCss = function(content, basePath){
-		var CSS_REGEXP = new RegExp(/url\(("|'|)(.+?)\1\)/)
-		var ast = css.parse(content)
+	const parseCss = function(content, basePath){
+		const CSS_REGEXP = new RegExp(/url\(("|'|)(.+?)\1\)/)
+		const ast = css.parse(content)
 		ast.stylesheet.rules.forEach(function(rule){
 			if(rule.type == 'rule'){
 				rule.declarations.forEach(function(declaration){
-					var match = declaration.value.match(CSS_REGEXP)
-					if(match){
-						usedImagesAdd(path.resolve(basePath, match[2]))
+					if(!!declaration.value){
+						const match = declaration.value.match(CSS_REGEXP)
+						if(match){
+							usedImagesAdd(path.resolve(basePath, match[2]))
+						}
 					}
 				})
 			}
@@ -67,11 +71,11 @@ function getUsedImages(filesGlob, callBack){
 	 * @param content
 	 * @param basePath
 	 */
-	var parseHtml = function(content, basePath){
+	const parseHtml = function(content, basePath){
 
-		var parser = new htmlParser.Parser({
+		const parser = new htmlParser.Parser({
 			onopentag: function(name, attribs){
-				var src = null
+				let src = null
 				// 正常图片
 				if(name === 'img') {
 					if(attribs.src){
@@ -101,15 +105,15 @@ function getUsedImages(filesGlob, callBack){
 
 	}
 
-	var bufferContents = function(file, encoding, cb){
+	const bufferContents = function(file, encoding, cb){
 
 		// 样式文件处理
-		var fileType = utils.typeByUrl(file.path)
-		var fileContents = String(file.contents)
+		const fileType = utils.typeByUrl(file.path)
+		const fileContents = String(file.contents)
 		if(fileType == 'css'){
-			parseCss(fileContents, file.base)
+			parseCss(fileContents, path.dirname(file.path))
 		}else if(fileType == 'html'){
-			parseHtml(fileContents, file.base)
+			parseHtml(fileContents, path.dirname(file.path))
 		}
 
 		cb()
