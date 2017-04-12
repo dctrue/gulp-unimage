@@ -26,21 +26,3 @@ exports.typeByUrl = function(url){
 	}
 	return type
 }
-
-/**
- * 判断是否是使用的图片
- * @param url
- * @param used
- * @returns {boolean}
- */
-exports.isUsedImage = function(url, used){
-	let flag = false
-	for(let i = 0, len = used.length; i < len; i++){
-		if(used[i] === url){
-			flag = true
-			break
-		}
-	}
-	return flag
-}
-

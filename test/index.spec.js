@@ -13,12 +13,19 @@ require('should')
 /**
  * use plug test
  * @param image
+ * @param plugOptions
  * @param callBack
  */
-function initTest(image, callBack){
-	const gulpUnimageOptions = {
+function initTest(image, plugOptions, callBack){
+	let gulpUnimageOptions = {
 		files: 'fixture/**/*.{html,css}'
 	}
+	if(arguments.length == 2){
+		callBack = plugOptions
+	}else{
+		gulpUnimageOptions = Object.assign(gulpUnimageOptions, plugOptions)
+	}
+
 	let fileData = null
 
 	const stream = gulpUnimage(gulpUnimageOptions)
@@ -59,6 +66,16 @@ describe('gulp unused image filter', () => {
 	it('image in subfolder should be passed when sbe used', done => {
 		initTest('fixture/subfolder/images/test.jpg', function(file){
 			file.basename.should.eql('test.jpg')
+			done()
+		})
+	})
+
+	it('some image in exclude and unused should be passed', done => {
+		const plugOptions = {
+			exclude: 'fixture/images/exclude/**/*'
+		}
+		initTest('fixture/images/exclude/exclude.jpg', plugOptions, function(file){
+			file.basename.should.eql('exclude.jpg')
 			done()
 		})
 	})
