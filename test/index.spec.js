@@ -2,94 +2,96 @@
  * Created by jlw on 2017/4/6.
  */
 
-var fs = require('fs')
-var path = require('path')
-var gutil = require('gulp-util')
-var gulpUnimage = require('../index')
+'use strict'
+const fs = require('fs')
+const path = require('path')
+const gutil = require('gulp-util')
+const gulpUnimage = require('../index')
 
 require('should')
 
-describe('gulp unused image filter', () => {
-
-	var gulpUnimageOptions = {
-		files: 'fixture/*.{html,css}'
+/**
+ * use plug test
+ * @param image
+ * @param plugOptions
+ * @param callBack
+ */
+function initTest(image, plugOptions, callBack){
+	let gulpUnimageOptions = {
+		files: 'fixture/**/*.{html,css}'
+	}
+	if(arguments.length == 2){
+		callBack = plugOptions
+	}else{
+		gulpUnimageOptions = Object.assign(gulpUnimageOptions, plugOptions)
 	}
 
+	let fileData = null
+
+	const stream = gulpUnimage(gulpUnimageOptions)
+
+	const fakeFile = new gutil.File({
+		path: path.normalize(`${__dirname}/${image}`),
+		contents: fs.readFileSync(`${__dirname}/${image}`)
+	})
+
+	stream.on('end', () => {
+		callBack(fileData)
+	})
+	stream.on('data', file => {
+		fileData = file
+	})
+
+	stream.write(fakeFile)
+	stream.end()
+}
+
+describe('gulp unused image filter', () => {
+
 	it('images should be passed when be used', done => {
-		var fileData = []
-		var useImages = ['test.jpg', 'test.png', 'test.gif', 'test.ico']
+		const images = [
+			'fixture/images/test.jpg',
+			'fixture/images/test.png',
+			'fixture/images/test.gif',
+			'fixture/images/test.ico'
+		]
+		for(let i = 0, len = images.length; i < len; i++){
+			initTest(images[i], function(file){
+				(images[i].indexOf(file.basename)).should.not.be.eql(-1)
+				if(i == len-1) done()
+			})
+		}
+	})
 
-		var stream = gulpUnimage(gulpUnimageOptions)
-
-		stream.on('end', () => {
-			// TODO: 在终端下直接mocha测试有问题，待解决
-			// (fileData.length).should.eql(useImages.length)
-			// for(var i = 0, len = fileData.length; i < len; i++){
-			// 	fileData[i].basename.should.eql(useImages[i])
-			// }
+	it('image in subfolder should be passed when sbe used', done => {
+		initTest('fixture/subfolder/images/test.jpg', function(file){
+			file.basename.should.eql('test.jpg')
 			done()
 		})
-		stream.on('data', file => {
-			if(!!file){
-				fileData.push(file)
-			}
-		})
+	})
 
-		for(var i = 0, len = useImages.length; i < len; i++){
-			var fakeFile = new gutil.File({
-				path: path.normalize(`${__dirname}/fixture/images/${useImages[i]}`),
-				contents: fs.readFileSync(`${__dirname}/fixture/images/${useImages[i]}`)
-			})
-			stream.write(fakeFile)
+	it('some image in exclude and unused should be passed', done => {
+		const plugOptions = {
+			exclude: 'fixture/images/exclude/**/*'
 		}
-
-		stream.end()
+		initTest('fixture/images/exclude/exclude.jpg', plugOptions, function(file){
+			file.basename.should.eql('exclude.jpg')
+			done()
+		})
 	})
 
 	it('image should be filter when be not used', done => {
-
-		var fileData = null
-
-		var stream = gulpUnimage(gulpUnimageOptions)
-
-		var fakeFile = new gutil.File({
-			path: path.normalize(`${__dirname}/fixture/images/other.jpg`),
-			contents: fs.readFileSync(`${__dirname}/fixture/images/other.jpg`)
-		})
-
-		stream.on('end', () => {
-			(fileData === null).should.be.true()
+		initTest('fixture/images/other.jpg', function(file){
+			(file === null).should.be.true()
 			done()
 		})
-		stream.on('data', file => {
-			fileData = file
-		})
-
-		stream.write(fakeFile)
-		stream.end()
-
 	})
 
 	it('other type should be filter', done => {
-		var fileData = null
-
-		var stream = gulpUnimage(gulpUnimageOptions)
-
-		var fakeFile = new gutil.File({
-			path: path.normalize(`${__dirname}/fixture/images/test.txt`),
-			contents: fs.readFileSync(`${__dirname}/fixture/images/test.txt`)
-		})
-
-		stream.on('end', () => {
-			(!fileData).should.be.true()
+		initTest('fixture/images/test.txt', function(file){
+			(file === null).should.be.true()
 			done()
 		})
-		stream.on('data', file => {
-			fileData = file
-		})
-
-		stream.write(fakeFile)
-		stream.end()
 	})
 
 })

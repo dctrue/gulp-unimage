@@ -13,18 +13,16 @@ npm install gulp-unimage --save-dev
 ```
 ## Example
 
-You can use sigle files, globbing patterns or URLS to run gulp-unimage:
+You can use single files, globbing patterns or URLS to run gulp-unimage:
 
 ```js
-var gulp = require('gulp')
-var gulpUnimage = require('../index')
-
 gulp.task('default', function(){
-	gulp.src('../test/fixture/images/**/*')
+	gulp.src(['../test/fixture/images/**/*', '../test/fixture/subfolder/images/**/*'], {base: '../test/fixture/'})
 		.pipe(gulpUnimage({
-			files: '../test/fixture/*.{css,html}'
+			files: '../test/fixture/**/*.{css,html}',
+			exclude: '../test/fixture/images/exclude/**/*'
 		}))
-		.pipe(gulp.dest('dist/images/'))
+		.pipe(gulp.dest('dist1/'))
 })
 ```
 ## Options
@@ -36,7 +34,16 @@ Type: `Array|String`
 
 The base files(html|css), we find in this base files, and make sure the image is used or not.
 
+### option.exclude
+
+Type: 'Array|String'
+
+The File want to be exclude
+
 ## Release History
 
+* 0.0.3
+ + add exclude files support
+ + some known bugs fixed
 * 0.0.2 Readme detail
 * 0.0.1 Initial release
