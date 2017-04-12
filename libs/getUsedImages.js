@@ -15,9 +15,10 @@ const utils = require('./utils')
 /**
  * 读取源过滤文件，获取过滤列表
  * @param filesGlob
+ * @param base
  * @param callBack
  */
-function getUsedImages(filesGlob, callBack){
+function getUsedImages(filesGlob, base, callBack){
 
 	callBack = callBack || function(){}
 
@@ -46,9 +47,9 @@ function getUsedImages(filesGlob, callBack){
 	/**
 	 * 样式类型处理
 	 * @param content
-	 * @param basePath
+	 * @param dirname
 	 */
-	const parseCss = function(content, basePath){
+	const parseCss = function(content, dirname){
 		const CSS_REGEXP = new RegExp(/url\(("|'|)(.+?)\1\)/)
 		const ast = css.parse(content)
 		ast.stylesheet.rules.forEach(function(rule){
@@ -57,7 +58,7 @@ function getUsedImages(filesGlob, callBack){
 					if(!!declaration.value){
 						const match = declaration.value.match(CSS_REGEXP)
 						if(match){
-							usedImagesAdd(path.resolve(basePath, match[2]))
+							usedImagesAdd(path.resolve(dirname, match[2]))
 						}
 					}
 				})
@@ -69,9 +70,9 @@ function getUsedImages(filesGlob, callBack){
 	/**
 	 * html类型处理
 	 * @param content
-	 * @param basePath
+	 * @param dirname
 	 */
-	const parseHtml = function(content, basePath){
+	const parseHtml = function(content, dirname){
 
 		const parser = new htmlParser.Parser({
 			onopentag: function(name, attribs){
@@ -97,7 +98,9 @@ function getUsedImages(filesGlob, callBack){
 				else if(name == 'video' && attribs.poster){
 					src = attribs.poster
 				}
-				if(!!src) usedImagesAdd(path.resolve(basePath, src))
+				if(!!src){
+					usedImagesAdd(path.resolve(dirname, src))
+				}
 			}
 		})
 
@@ -108,12 +111,13 @@ function getUsedImages(filesGlob, callBack){
 	const bufferContents = function(file, encoding, cb){
 
 		// 样式文件处理
-		const fileType = utils.typeByUrl(file.path)
+		const extname = file.extname
 		const fileContents = String(file.contents)
-		if(fileType == 'css'){
-			parseCss(fileContents, path.dirname(file.path))
-		}else if(fileType == 'html'){
-			parseHtml(fileContents, path.dirname(file.path))
+		const dirname = base ? path.dirname(path.resolve(base, file.relative)) : file.dirname
+		if(extname == '.css'){
+			parseCss(fileContents, dirname)
+		}else if(extname == '.html'){
+			parseHtml(fileContents, dirname)
 		}
 
 		cb()

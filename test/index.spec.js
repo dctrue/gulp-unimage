@@ -89,7 +89,7 @@ describe('gulp unused image filter', () => {
 
 	it('other type should be filter', done => {
 		initTest('fixture/images/test.txt', function(file){
-			(file === null).should.be.true()
+			file.basename.should.eql('test.txt')
 			done()
 		})
 	})

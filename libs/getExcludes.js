@@ -1,6 +1,7 @@
 /**
  * Created by jlw on 2017/4/12.
  */
+'use strict'
 
 const vfs = require('vinyl-fs')
 const through = require('through2')
