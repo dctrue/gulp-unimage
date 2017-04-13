@@ -9,7 +9,9 @@ gulp.task('default', function(){
 	gulp.src(['../test/fixture/images/**/*', '../test/fixture/subfolder/images/**/*'], {base: '../test/fixture/'})
 		.pipe(gulpUnimage({
 			files: '../test/fixture/**/*.{css,html}',
-			exclude: '../test/fixture/images/exclude/**/*'
+			base: '../test/fixture/',
+			exclude: '../test/fixture/images/exclude/**/*',
+			debug: true
 		}))
-		.pipe(gulp.dest('dist1/'))
+		.pipe(gulp.dest('dist/'))
 })

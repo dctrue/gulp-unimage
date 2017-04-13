@@ -10,6 +10,7 @@ const path = require('path')
 
 const getUsedImages = require('./libs/getUsedImages')
 const getExcludes = require('./libs/getExcludes')
+const utils = require('./libs/utils')
 
 // 插件名称
 const PLUGIN_NAME = 'gulp-unimage'
@@ -25,7 +26,9 @@ function unUsedImage(options){
 
 	const opts = Object.assign({
 		files: null,
-		exclude: null
+		base: '',
+		exclude: '',
+		debug: false
 	}, JSON.parse(JSON.stringify(options)) || {})
 
 	// 已使用图片的列表(不被过滤的图片列表)
@@ -34,6 +37,8 @@ function unUsedImage(options){
 	let filters = []
 	// 排除不经过插件处理的文件列表
 	let excludes = null
+	// 过滤文件大小存储
+	let fileFilterSize = 0
 
 	/**
 	 * 判断是否是过滤的图片
@@ -86,7 +91,7 @@ function unUsedImage(options){
 		}
 		// 加载已使用图片列表数据
 		if(!usedImages){
-			getUsedImages(opts.files, function(usedImagesRes){
+			getUsedImages(opts.files, opts.base, function(usedImagesRes){
 				usedImages = usedImagesRes
 				++count
 				check()
@@ -100,17 +105,20 @@ function unUsedImage(options){
 
 	/**
 	 * 过滤文件
-	 * @param filePath
+	 * @param file
 	 * @returns {boolean|string}
 	 */
-	function filter(filePath){
+	function filter(file){
 
-		// 过滤排除的图片或者是没有使用的图片
-		if(isExclude(filePath) || isUsedImage(filePath)){
+		const filePath = file.path
+
+		if(isExclude(filePath) || isUsedImage(filePath) || utils.typeByUrl(filePath) != 'image'){
 			return false
 		}
+		// 过滤文件
 		addFilter(filePath)
-		return filePath
+		fileFilterSize += file.contents.length
+		return file
 
 	}
 
@@ -141,7 +149,7 @@ function unUsedImage(options){
 		beforeFilter(function(){
 
 			// 文件过滤
-			const result = filter(file.path)
+			const result = filter(file)
 			if(result){
 				// 被过滤文件直接返回空
 				return callBack()
@@ -161,15 +169,16 @@ function unUsedImage(options){
 	 */
 	function endStream(callBack){
 
-		gutil.log('--------------------------------------')
-		gutil.log(PLUGIN_NAME + ': Skipping files list: ')
-		gutil.log('Unused and filtered images: ' + filters.length)
-		gutil.log('--------------------------------------')
-		// 控制台输出被过滤列表
-		for(let i = 0, len = filters.length; i < len; i++){
-			gutil.log(gutil.colors.blue(filters[i]))
+		gutil.log(PLUGIN_NAME + ': Filter '+ filters.length +' images unused. '
+			+ gutil.colors.grey('(saved '+ (fileFilterSize/1024).toFixed(1) +' kb)'))
+		if(opts.debug){
+			gutil.log('--------------------------------------')
+			// 控制台输出被过滤列表
+			for(let i = 0, len = filters.length; i < len; i++){
+				gutil.log('Filte: ' + gutil.colors.blue(filters[i]))
+			}
+			gutil.log('--------------------------------------')
 		}
-		gutil.log('--------------------------------------')
 		callBack()
 
 	}
