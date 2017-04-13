@@ -1,6 +1,6 @@
 # gulp-unimage
 
-gulp-unimage is a gulp plugin to remove unused image when package images.
+It's a gulp plugin that help you filter some unsed image when package images.
 
 ## Install
 
@@ -65,7 +65,7 @@ Run with debug mode
 
 ## Release History
 
-* 0.0.4
+* 0.1.1
  + add image base support
 * 0.0.3
  + add exclude files support

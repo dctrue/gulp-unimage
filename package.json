@@ -1,6 +1,6 @@
 {
   "name": "gulp-unimage",
-  "version": "0.0.3",
+  "version": "0.1.1",
   "description": "Remove unused image file",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,8 @@
   },
   "keywords": [
     "gulp",
+    "unused",
+    "filter",
     "image",
     "gulp plugin"
   ],
