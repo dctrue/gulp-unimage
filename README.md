@@ -65,10 +65,10 @@ Run with debug mode
 
 ## Release History
 
-* 0.1.1
- + add image base support
-* 0.0.3
- + add exclude files support
- + some known bugs fixed
-* 0.0.2 Readme detail
-* 0.0.1 Initial release
+### 0.1.1
+* add image base support
+### 0.0.3
+* add exclude files support
+* some known bugs fixed
+### 0.0.2 Readme detail
+### 0.0.1 Initial release

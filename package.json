@@ -3,6 +3,8 @@
   "version": "0.1.1",
   "description": "Remove unused image file",
   "main": "index.js",
+  "homepage": "https://github.com/dctrue/gulp-unimage",
+  "repository": "git://github.com/dctrue/gulp-unimage.git",
   "scripts": {
     "test": "mocha"
   },
