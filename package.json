@@ -22,11 +22,16 @@
     "gulp-util": "^3.0.8",
     "htmlparser2": "^3.9.2",
     "through2": "^2.0.3",
-    "vinyl-fs": "^2.4.4"
+    "vinyl-fs": "^2.4.4",
+    "bluebird": "^3.5.0"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
     "mocha": "^3.2.0",
+    "rewire": "^2.5.2",
     "should": "^11.2.1"
+  },
+  "engines": {
+    "node": ">=4.0.0"
   }
 }

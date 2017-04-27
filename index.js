@@ -10,10 +10,21 @@ const path = require('path')
 
 const getUsedImages = require('./libs/getUsedImages')
 const getExcludes = require('./libs/getExcludes')
-const utils = require('./libs/utils')
 
 // 插件名称
 const PLUGIN_NAME = 'gulp-unimage'
+
+/**
+ * 根据url类型判断是否是图片
+ * @param url
+ * @returns {boolean}
+ */
+function isNomalImage(url) {
+	// 图片类的扩展名
+	const IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico']
+	const extension = path.extname(url).toLowerCase()
+	return IMG_EXTENSIONS.indexOf(extension) !== -1
+}
 
 /**
  * 过滤没有使用过的图片 主函数
@@ -112,7 +123,7 @@ function unUsedImage(options){
 
 		const filePath = file.path
 
-		if(isExclude(filePath) || isUsedImage(filePath) || utils.typeByUrl(filePath) != 'image'){
+		if(isExclude(filePath) || isUsedImage(filePath) || !isNomalImage(filePath)){
 			return false
 		}
 		// 过滤文件
@@ -183,10 +194,8 @@ function unUsedImage(options){
 
 	}
 
-	const stream = through.obj(bufferContents, endStream)
-
 	// 返回流
-	return stream
+	return through.obj(bufferContents, endStream)
 
 }
 
