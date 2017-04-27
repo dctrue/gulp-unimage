@@ -56,9 +56,12 @@ function getUsedImages(filesGlob, base, callBack){
 			if(rule.type == 'rule'){
 				rule.declarations.forEach(function(declaration){
 					if(!!declaration.value){
-						const match = declaration.value.match(CSS_REGEXP)
-						if(match){
-							usedImagesAdd(path.resolve(dirname, match[2]))
+						const values = declaration.value.split(',')
+						for(let i = 0, len = values.length; i < len; i++){
+							const match = values[i].match(CSS_REGEXP)
+							if(match){
+								usedImagesAdd(path.resolve(dirname, match[2]))
+							}
 						}
 					}
 				})
