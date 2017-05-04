@@ -3,7 +3,7 @@
     background: url("images/test.jpg");
 }
 .gif {
-    background: url("images/test.gif");
+    background: url("images/test.gif"), url("images/test.jpg");
 }
 .base64
 {

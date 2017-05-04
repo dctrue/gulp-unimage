@@ -10,6 +10,8 @@ const path = require('path')
 const css = require('css')
 const htmlParser = require('htmlparser2')
 
+const utils = require('./utils')
+
 /**
  * 读取源过滤文件，获取过滤列表
  * @param filesGlob
@@ -46,34 +48,27 @@ function getUsedImages(filesGlob, base, callBack){
 	 * 样式类型处理
 	 * @param content
 	 * @param dirname
+	 * @param file
 	 */
 	const parseCss = function(content, dirname, file){
 		const CSS_REGEXP = new RegExp(/url\(("|'|)(.+?)\1\)/)
-		try{
-			const ast = css.parse(content)
-			ast.stylesheet.rules.forEach(function(rule){
-				if(rule.type == 'rule'){
-					rule.declarations.forEach(function(declaration){
-						if(!!declaration.value){
-							const match = declaration.value.match(CSS_REGEXP)
+		const ast = css.parse(content, {source: file.path})
+		ast.stylesheet.rules.forEach(function(rule){
+			if(rule.type == 'rule'){
+				rule.declarations.forEach(function(declaration){
+					if(!!declaration.value){
+						const values = declaration.value.split(',')
+						for(let i = 0, len = values.length; i < len; i++){
+							const match = values[i].match(CSS_REGEXP)
 							if(match){
 								usedImagesAdd(path.resolve(dirname, match[2]))
 							}
 						}
-					})
-				}
+					}
+				})
+			}
 
-			})
-		}catch(e){
-			let err = new Error('[gulp-unimage]: ' +
-				'file: ' + file.path +
-				' ' + e.reason +
-				' in line ' + e.line +
-				' column ' + e.column)
-			err.filename = file.basename
-			err.path = file.path
-			throw err
-		}
+		})
 	}
 
 	/**
@@ -126,7 +121,7 @@ function getUsedImages(filesGlob, base, callBack){
 		if(extname == '.css'){
 			parseCss(fileContents, dirname, file)
 		}else if(extname == '.html'){
-			parseHtml(fileContents, dirname, file)
+			parseHtml(fileContents, dirname)
 		}
 
 		cb()
