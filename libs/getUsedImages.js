@@ -48,10 +48,11 @@ function getUsedImages(filesGlob, base, callBack){
 	 * 样式类型处理
 	 * @param content
 	 * @param dirname
+	 * @param file
 	 */
-	const parseCss = function(content, dirname){
+	const parseCss = function(content, dirname, file){
 		const CSS_REGEXP = new RegExp(/url\(("|'|)(.+?)\1\)/)
-		const ast = css.parse(content)
+		const ast = css.parse(content, {source: file.path})
 		ast.stylesheet.rules.forEach(function(rule){
 			if(rule.type == 'rule'){
 				rule.declarations.forEach(function(declaration){
@@ -118,7 +119,7 @@ function getUsedImages(filesGlob, base, callBack){
 		const fileContents = String(file.contents)
 		const dirname = base ? path.dirname(path.resolve(base, file.relative)) : file.dirname
 		if(extname == '.css'){
-			parseCss(fileContents, dirname)
+			parseCss(fileContents, dirname, file)
 		}else if(extname == '.html'){
 			parseHtml(fileContents, dirname)
 		}
