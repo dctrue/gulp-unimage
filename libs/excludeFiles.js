@@ -11,7 +11,7 @@ const Promise = require('bluebird')
  * 获取排除处理的图片url列表，该列表直接不经过插件处理直接通过
  * @param excludeGlob
  */
-function excludeFiles(excludeGlob){
+const excludeFiles = function(excludeGlob){
 
 	return new Promise(function(resolve){
 

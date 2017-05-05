@@ -1,44 +1,101 @@
+/**
+ * Created by jlw on 2017/4/6.
+ */
+
+'use strict'
+const fs = require('fs')
+const path = require('path')
+const gutil = require('gulp-util')
+const gulpUnimage = require('../index')
 
 const should = require('should')
-const rewire = require('rewire')
 
-const index = rewire('../index.js')
+/**
+ * use plug test
+ * @param image
+ * @param plugOptions
+ * @param callBack
+ */
+function initTest(image, plugOptions, callBack){
+	let gulpUnimageOptions = {
+		files: 'fixture/**/*.{html,css}'
+	}
+	if(arguments.length == 2){
+		callBack = plugOptions
+	}else{
+		gulpUnimageOptions = Object.assign(gulpUnimageOptions, plugOptions)
+	}
 
-describe('index test', () => {
+	let fileData = null
 
-	describe('private methods test in index', () => {
+	const stream = gulpUnimage(gulpUnimageOptions)
 
-		describe('index private method #isImageByUrl() test', () => {
+	const fakeFile = new gutil.File({
+		path: path.normalize(`${__dirname}/${image}`),
+		contents: fs.readFileSync(`${__dirname}/${image}`)
+	})
 
-			const isNomalImage = index.__get__('isNomalImage')
-			const MOCK_IMAGE_URL = [
-				'../imges/test.jpg',
-				'../imges/test.jpeg',
-				'../imges/test.png',
-				'../imges/test.gif',
-				'../imges/test.ico',
-				'../imges/test.svg'
-			]
-			const MOCK_UNIMAGE_URL = [
-				'../other/test.txt',
-				'../other/test.css',
-				'../other/test.html',
-			]
+	stream.on('end', () => {
+		callBack(fileData)
+	})
+	stream.on('data', file => {
+		fileData = file
+	})
 
-			it('should return true when typeof url is a image', () => {
-				MOCK_IMAGE_URL.forEach(url => {
-					isNomalImage(url).should.be.equal(true)
-				})
+	stream.write(fakeFile)
+	stream.end()
+}
+
+describe('gulp unused image filter', () => {
+
+	it('images should be piped when be used', done => {
+		const images = [
+			'fixture/images/test.jpg',
+			'fixture/images/test.png',
+			'fixture/images/test.gif',
+			'fixture/images/test.ico'
+		]
+		for(let i = 0, len = images.length; i < len; i++){
+			initTest(images[i], function(file){
+				should.exist(file)
+				file.path.indexOf(images[i].split('/')[2]).should.above(-1)
+				if(i == len-1) done()
 			})
+		}
+	})
 
-			it('should return false when typeof url is not a image', () => {
-				MOCK_UNIMAGE_URL.forEach(url => {
-					isNomalImage(url).should.be.equal(false)
-				})
-			})
-
+	it('image in subfolder should be piped when be used', done => {
+		initTest('fixture/subfolder/images/test.jpg', function(file){
+			should.exist(file)
+			file.path.indexOf('test.jpg').should.above(-1)
+			done()
 		})
+	})
 
+	it('some image not be used but in exclude file list should be piped', done => {
+		const plugOptions = {
+			exclude: 'fixture/images/exclude/**/*'
+		}
+		initTest('fixture/images/exclude/exclude.jpg', plugOptions, function(file){
+			should.exist(file)
+			file.path.indexOf('exclude.jpg').should.above(-1)
+			done()
+		})
+	})
+
+	it('image should be filter when be not used', done => {
+		initTest('fixture/images/other.jpg', function(file){
+			should.not.exist(file)
+			done()
+		})
+	})
+
+	it('other type should be piped', done => {
+		initTest('fixture/images/test.txt', function(file){
+			should.exist(file)
+			file.path.indexOf('test.txt').should.above(-1)
+			done()
+		})
 	})
 
 })

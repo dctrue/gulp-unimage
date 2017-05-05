@@ -7,9 +7,10 @@
 const through = require('through2')
 const gutil = require('gulp-util')
 const path = require('path')
+const Promise = require('bluebird')
 
-const getUsedImages = require('./libs/getUsedImages')
-const getExcludes = require('./libs/getExcludes')
+const usedImages = require('./libs/usedImages')
+const excludeFiles = require('./libs/excludeFiles')
 
 // 插件名称
 const PLUGIN_NAME = 'gulp-unimage'
@@ -19,7 +20,7 @@ const PLUGIN_NAME = 'gulp-unimage'
  * @param url
  * @returns {boolean}
  */
-function isNomalImage(url) {
+const isNomalImage = function(url) {
 	// 图片类的扩展名
 	const IMG_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico']
 	const extension = path.extname(url).toLowerCase()
@@ -33,7 +34,7 @@ function isNomalImage(url) {
  * @param options.exclude {glob} 排除过滤动作，直接通过的图片文件
  * @returns {*}
  */
-function unUsedImage(options){
+const unUsedImage = function(options){
 
 	const opts = Object.assign({
 		files: null,
@@ -43,7 +44,7 @@ function unUsedImage(options){
 	}, JSON.parse(JSON.stringify(options)) || {})
 
 	// 已使用图片的列表(不被过滤的图片列表)
-	let usedImages = null
+	let useds = null
 	// 过滤的文件列表
 	let filters = []
 	// 排除不经过插件处理的文件列表
@@ -56,8 +57,8 @@ function unUsedImage(options){
 	 * @param filePath
 	 * @returns {boolean}
 	 */
-	function isUsedImage(filePath){
-		return usedImages.indexOf(filePath) != -1
+	const isUsedImage = function(filePath){
+		return useds.indexOf(filePath) != -1
 	}
 
 	/**
@@ -65,7 +66,7 @@ function unUsedImage(options){
 	 * @param filePath
 	 * @returns {boolean}
 	 */
-	function isExclude(filePath){
+	const isExclude = function(filePath){
 		return (opts.exclude && excludes.indexOf(filePath) != -1) ? true : false
 	}
 
@@ -73,7 +74,7 @@ function unUsedImage(options){
 	 * 把过滤文件加入过滤列表
 	 * @param filePath
 	 */
-	function addFilter(filePath){
+	const addFilter = function(filePath){
 		filters.push(path.normalize(filePath))
 	}
 
@@ -81,37 +82,45 @@ function unUsedImage(options){
 	 * 过滤之前事务处理  (已使用图片数据准备、排除不经过插件处理的文件数据准备)
 	 * @param callBack
 	 */
-	function beforeFilter(callBack){
+	const beforeFilter = function(){
 
-		let count = 0
-		const check = function(){
-			if(count == 2){
-				callBack()
+		return new Promise(function(resolve){
+
+			let count = 0
+
+			const check = function(){
+				if(count == 2){
+					resolve()
+				}
 			}
-		}
 
-		// 加载排除文件数据
-		if(!excludes && !!opts.exclude){
-			getExcludes(opts.exclude, function(excludesRes){
-				excludes = excludesRes
+			if(!excludes && !!opts.exclude){
+				excludeFiles(opts.exclude)
+					.then(function(excludesRes){
+						excludes = excludesRes
+						++count
+						check()
+					})
+			}else{
 				++count
-				check()
-			})
-		}else{
-			++count
-		}
-		// 加载已使用图片列表数据
-		if(!usedImages){
-			getUsedImages(opts.files, opts.base, function(usedImagesRes){
-				usedImages = usedImagesRes
-				++count
-				check()
-			})
-		}else{
-			++count
-		}
+			}
 
-		check()
+			// 加载已使用图片列表数据
+			if(!useds){
+				usedImages(opts.files, opts.base)
+					.then(function(usedImagesRes){
+						useds = usedImagesRes
+						++count
+						check()
+					})
+			}else{
+				++count
+			}
+
+			check()
+
+		})
+
 	}
 
 	/**
@@ -119,7 +128,7 @@ function unUsedImage(options){
 	 * @param file
 	 * @returns {boolean|string}
 	 */
-	function filter(file){
+	const filter = function(file){
 
 		const filePath = file.path
 
@@ -140,7 +149,7 @@ function unUsedImage(options){
 	 * @param callBack
 	 * @returns {*}
 	 */
-	function bufferContents(file, encoding, callBack){
+	const bufferContents = function(file, encoding, callBack){
 
 		// 空文件直接返回
 		if(file.isNull()){
@@ -157,7 +166,7 @@ function unUsedImage(options){
 		}
 
 		// 数据准备
-		beforeFilter(function(){
+		beforeFilter().then(function(){
 
 			// 文件过滤
 			const result = filter(file)
@@ -168,7 +177,6 @@ function unUsedImage(options){
 				// 不被过滤文件，把文件返回
 				callBack(null, file)
 			}
-
 		})
 
 	}

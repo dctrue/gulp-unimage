@@ -6,7 +6,7 @@
   "homepage": "https://github.com/dctrue/gulp-unimage",
   "repository": "git://github.com/dctrue/gulp-unimage.git",
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/.bin/mocha"
   },
   "keywords": [
     "gulp",
@@ -18,17 +18,16 @@
   "author": "jlw <dctrue.jiang@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "css": "^2.2.1",
     "gulp-util": "^3.0.8",
     "htmlparser2": "^3.9.2",
     "through2": "^2.0.3",
-    "vinyl-fs": "^2.4.4",
-    "bluebird": "^3.5.0"
+    "vinyl-fs": "^2.4.4"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
-    "rewire": "^2.5.2",
     "should": "^11.2.1"
   },
   "engines": {
